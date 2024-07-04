@@ -1,39 +1,73 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useReducer, useState } from 'react';
+
+import DigitBtn from './components/digitBtn';
+import OperationBtn from './components/operationBtn';
+
 import './App.css'
+
+export const ACTIONS = {
+    ADD_DIGIT: 'add-digit',
+    CHOOSE_OPERATION: 'choose-operation',
+    CLEAR: 'clear',
+    REMOVE_DIGIT: 'remove-digit',
+    EVALUATE: 'evaluate'
+}
+
+function reducer(state, { type, payload }) {
+    switch (type) {
+        case ACTIONS.ADD_DIGIT:
+            if(state.currentOperand === '0' && payload.digit === '0') {
+                return state;
+            }
+            if(payload.digit === '.' && state.currentOperand.includes('.')) {
+                return state;
+            }
+            return {
+                ...state,
+                currentOperand: `${state.currentOperand || ''}${payload.digit}`
+            }
+        case ACTIONS.CHOOSE_OPERATION:
+            return {
+                ...state,
+                currentOperand: '',
+                previousOperand: `${state.currentOperand} ${payload.operation}`
+            }
+    }
+}
 
 function App() {
 
-  return (
-    <div className='container'>
+    const [{ currentOperand, previousOperand, operation }, dispatch] = useReducer(reducer, {});
 
-      <div className='output'>
-        <div className='previous'></div>
-        <div className='current'></div>
-      </div>
+    return (
+        <div className='container'>
 
-      <button className='span-two'>AC</button>
-      <button>DEL</button>
-      <button value='/'>/</button>
-      <button value='1'>1</button>
-      <button value='2'>2</button>
-      <button value='3'>3</button>
-      <button value='*'>*</button>
-      <button value='4'>4</button>
-      <button value='5'>5</button>
-      <button value='6'>6</button>
-      <button value='+'>+</button>
-      <button value='7'>7</button>
-      <button value='8'>8</button>
-      <button value='9'>9</button>
-      <button value='-'>-</button>
-      <button value='.'>.</button>
-      <button value='0'>0</button>
-      <button className='span-two'>=</button>
+            <div className='output'>
+                <div className='previous'>{previousOperand} {operation}</div>
+                <div className='current'>{currentOperand}</div>
+            </div>
 
-    </div>
-  )
+            <button className='span-two'>AC</button>
+            <button>DEL</button>
+            <OperationBtn operation='/' dispatch={dispatch} />
+            <DigitBtn digit='1' dispatch={dispatch} />
+            <DigitBtn digit='2' dispatch={dispatch} />
+            <DigitBtn digit='3' dispatch={dispatch} />
+            <OperationBtn operation='*' dispatch={dispatch} />
+            <DigitBtn digit='4' dispatch={dispatch} />
+            <DigitBtn digit='5' dispatch={dispatch} />
+            <DigitBtn digit='6' dispatch={dispatch} />
+            <OperationBtn operation='+' dispatch={dispatch} />
+            <DigitBtn digit='7' dispatch={dispatch} />
+            <DigitBtn digit='8' dispatch={dispatch} />
+            <DigitBtn digit='9' dispatch={dispatch} />
+            <OperationBtn operation='-' dispatch={dispatch} />
+            <DigitBtn digit='.' dispatch={dispatch} />
+            <DigitBtn digit='0' dispatch={dispatch} />
+            <button className='span-two'>=</button>
+
+        </div>
+    )
 }
 
 export default App
