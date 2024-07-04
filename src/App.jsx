@@ -27,17 +27,59 @@ function reducer(state, { type, payload }) {
                 ...state,
                 currentOperand: `${state.currentOperand || ''}${payload.digit}`
             }
-
         case ACTIONS.CLEAR:
             return {};
 
-        case ACTIONS.CHOOSE_OPERATION:
+        case ACTIONS.REMOVE_DIGIT:
             return {
                 ...state,
-                currentOperand: '',
-                previousOperand: `${state.currentOperand} ${payload.operation}`
+                currentOperand: state.currentOperand.slice(0, -1)
+            }
+        case ACTIONS.CHOOSE_OPERATION:
+            if (state.currentOperand == null && state.previousOperand == null) {
+                return state;
+            }
+            if (state.previousOperand == null) {
+                return {
+                    ...state,
+                    operation: payload.operation,
+                    currentOperand: null,
+                    previousOperand: state.currentOperand
+                }
+            }
+            return {
+                ...state,
+                operation: payload.operation,
+                currentOperand: null,
+                previousOperand: evaluate(state)
             }
     }
+}
+
+function evaluate(state) {
+    let result = '';
+    let current = Number(state.currentOperand);
+    let previous = Number(state.previousOperand);
+    if (isNaN(current) || isNaN(previous)) return '';
+    switch (state.operation) {
+        case '/':
+            result = previous / current;
+            break;
+
+        case '+':
+            result = previous + current;
+            break;
+
+        case '*':
+            result = previous * current;
+            break;
+
+        case '-':
+            result = previous - current;
+            break;
+    }
+
+    return result.toString();
 }
 
 function App() {
@@ -53,7 +95,7 @@ function App() {
             </div>
 
             <button className='span-two' onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
-            <button>DEL</button>
+            <button onClick={() => dispatch({ type: ACTIONS.CLEAR })}>DEL</button>
             <OperationBtn operation='/' dispatch={dispatch} />
             <DigitBtn digit='1' dispatch={dispatch} />
             <DigitBtn digit='2' dispatch={dispatch} />
