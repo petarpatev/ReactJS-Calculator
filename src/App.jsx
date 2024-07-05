@@ -23,11 +23,19 @@ function reducer(state, { type, payload }) {
             if (payload.digit === '.' && state.currentOperand.includes('.')) {
                 return state;
             }
-            if(state.overwrite) {
+            if (state.overwrite) {
                 return {
                     ...state,
                     currentOperand: payload.digit,
                     overwrite: false
+                }
+            }
+            if (state.currentOperand === '0' && state.previousOperand != null && state.operation == '/') {
+                return {
+                    ...state,
+                    previousOperand: null,
+                    operation: null,
+                    currentOperand: payload.digit
                 }
             }
             return {
@@ -54,14 +62,14 @@ function reducer(state, { type, payload }) {
                     previousOperand: state.currentOperand
                 }
             }
-            if(state.currentOperand == null) {
+            if (state.currentOperand == null) {
                 return {
                     ...state,
                     operation: payload.operation
                 }
 
             }
-            if(state.currentOperand == 0 && state.previousOperand != null) {
+            if (state.currentOperand == 0 && state.previousOperand != null) {
                 return {
                     ...state,
                     currentOperand: null,
@@ -75,10 +83,10 @@ function reducer(state, { type, payload }) {
                 previousOperand: evaluate(state)
             }
         case ACTIONS.EVALUATE:
-            if(state.currentOperand == null || state.previousOperand == null) {
+            if (state.currentOperand == null || state.previousOperand == null) {
                 return state;
             }
-            if(state.currentOperand == 0 && state.previousOperand != null && state.operation === '/') {
+            if (state.currentOperand == 0 && state.previousOperand != null && state.operation === '/') {
                 return state;
             }
             return {
