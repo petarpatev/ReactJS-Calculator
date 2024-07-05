@@ -23,6 +23,13 @@ function reducer(state, { type, payload }) {
             if (payload.digit === '.' && state.currentOperand.includes('.')) {
                 return state;
             }
+            if(state.overwrite) {
+                return {
+                    ...state,
+                    currentOperand: payload.digit,
+                    overwrite: false
+                }
+            }
             return {
                 ...state,
                 currentOperand: `${state.currentOperand || ''}${payload.digit}`
@@ -71,11 +78,12 @@ function reducer(state, { type, payload }) {
             if(state.currentOperand == null || state.previousOperand == null) {
                 return state;
             }
-            if(state.currentOperand == 0 && state.previousOperand != null) {
+            if(state.currentOperand == 0 && state.previousOperand != null && state.operation === '/') {
                 return state;
             }
             return {
                 ...state,
+                overwrite: true,
                 operation: null,
                 previousOperand: null,
                 currentOperand: evaluate(state)
@@ -122,7 +130,7 @@ function App() {
             </div>
 
             <button className='span-two' onClick={() => dispatch({ type: ACTIONS.CLEAR })}>AC</button>
-            <button onClick={() => dispatch({ type: ACTIONS.CLEAR })}>DEL</button>
+            <button onClick={() => dispatch({ type: ACTIONS.REMOVE_DIGIT })}>DEL</button>
             <OperationBtn operation='/' dispatch={dispatch} />
             <DigitBtn digit='1' dispatch={dispatch} />
             <DigitBtn digit='2' dispatch={dispatch} />
